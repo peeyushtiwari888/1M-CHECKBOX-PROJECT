@@ -1,84 +1,216 @@
-# Real-Time Checkboxes
+# 🚀 Real-Time Checkboxes System
 
-A scalable, real-time web application featuring a large grid of checkboxes. This project allows multiple users to connect simultaneously and toggle checkboxes, with state updates broadcasted instantly to all connected clients. It includes robust authentication and security measures to prevent abuse.
+A scalable, real-time web application inspired by the “1 Million Checkboxes” concept. This system allows multiple authenticated users to interact with a massive grid of checkboxes, with updates synchronized instantly across all connected clients using WebSockets and Redis.
 
-## ✨ Features
+---
 
-*   **Real-time Synchronization:** Checkbox state is synced across all connected clients instantly using WebSockets.
-*   **Google OAuth Authentication:** Users must log in via Google to modify the grid, ensuring accountability.
-*   **Secure WebSockets:** Socket connections are secured and validated against the Express session; unauthenticated attempts are rejected at the protocol level.
-*   **Rate Limiting:** Built-in rate limiting per socket connection (1 toggle every 5 seconds) to prevent abuse and spam.
-*   **Modern UI:** A beautiful, responsive, dark-themed UI with glassmorphism effects, smooth animations, and toast notifications.
+## 📌 Project Overview
+
+This project demonstrates real-time communication, distributed system design, and backend scalability using **Node.js, WebSockets, and Redis**.
+
+The application is designed to handle a large number of checkboxes efficiently while ensuring:
+
+- Low latency updates  
+- Consistent shared state  
+- Abuse prevention via rate limiting  
+- Secure user authentication  
+
+---
 
 ## 🛠 Tech Stack
 
-*   **Frontend:** Vanilla HTML, CSS, JavaScript
-*   **Backend:** Node.js, Express.js
-*   **Real-time Engine:** Socket.IO
-*   **Authentication:** Passport.js (Google OAuth 2.0), express-session
+### Frontend
+- HTML  
+- CSS  
+- JavaScript  
 
-## 🚀 Local Setup & Installation
+### Backend
+- Node.js  
+- Express.js  
 
-### Prerequisites
+### Real-Time Communication
+- WebSockets (Socket.IO)  
 
-*   Node.js (v18 or higher recommended)
-*   A package manager like `npm` or `pnpm`
-*   A Google Cloud account to create OAuth credentials.
+### Data Layer
+- Redis (Bitmap + Pub/Sub)  
 
-### Installation Steps
+### Authentication
+- OAuth 2.0 / OIDC (Google OAuth using Passport.js)  
 
-1.  **Clone the repository and navigate into the directory:**
-    ```bash
-    # (If cloning from git)
-    # git clone <your-repo-url>
-    cd CHECKBOXES\ PROJECT
-    ```
+---
 
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    # or using pnpm
-    pnpm install
-    ```
+## ✨ Features
 
-3.  **Set up Environment Variables:**
-    Copy the `.env.example` file to create your own `.env` file:
-    ```bash
-    cp .env.example .env
-    ```
-    
-    Open the `.env` file and fill in your Google OAuth credentials:
-    ```env
-    OAUTH_CLIENT_ID=your_google_client_id_here
-    OAUTH_CLIENT_SECRET=your_google_client_secret_here
-    SESSION_SECRET=a_random_secure_string
-    PORT=8000
-    ```
+- 🔄 Real-time checkbox synchronization across all users  
+- 🔐 OAuth-based authentication (only logged-in users can modify state)  
+- ⚡ Redis Bitmap for memory-efficient storage of large checkbox grid  
+- 📡 Redis Pub/Sub for multi-server synchronization  
+- 🚫 Custom rate limiting (no external libraries used)  
+- 👥 Proper socket connection and user session handling  
+- 🧱 Clean and modular backend architecture  
+- 🎨 Responsive and optimized frontend rendering  
 
-### Obtaining Google OAuth Credentials
+---
 
-1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
-2. Create a new project or select an existing one.
-3. Navigate to **APIs & Services** > **Credentials**.
-4. Click **Create Credentials** > **OAuth client ID**.
-5. Choose **Web application** as the application type.
-6. Under **Authorized redirect URIs**, add exactly: `http://localhost:8000/auth/google/callback`
-7. Click Create, and copy your Client ID and Client Secret into your `.env` file.
+## 🧠 System Architecture
+Client (Browser)
+↓
+WebSocket Connection (Socket.IO)
+↓
+Node.js + Express Server
+↓
+Redis
+├── Bitmap (Checkbox State)
+├── Pub/Sub (Real-time Sync)
+└── Rate Limiting (Counters)
+---
 
-## 🏃 Running the Application
+---
 
-Start the development server:
+## ⚙️ How It Works
 
+### 1. Checkbox State Management
+
+- All checkboxes are stored using a **Redis Bitmap**
+- Each checkbox index represents a bit
+
+Example:
 ```bash
+SETBIT checkboxes 100 1
+GETBIT checkboxes 100
+✔ Efficient for handling millions of checkboxes
+✔ Minimal memor2. Real-Time Update Flow
+User toggles checkbox
+Frontend emits event via WebSocket
+Backend:
+Validates authentication
+Applies rate limiting
+Updates Redis
+Publishes event
+All clients receive update instantly
+3. Redis Pub/Sub (Scaling)
+Used to sync updates across multiple backend instances
+Ensures consistency in distributed environments
+4. Authentication Flow
+OAuth 2.0 login (Google)
+Session stored using Express session
+Socket connections validated using session
+
+✔ Only authenticated users can toggle checkboxes
+✔ Anonymous users get read-only access
+
+5. Custom Rate Limiting Logic
+
+Implemented manually using Redis:
+
+Each user/socket has a key
+Counter + expiry used for time window control
+
+Example:
+
+INCR rate:userId
+EXPIRE rate:userId 5
+
+✔ Prevents spam clicking
+✔ Works for both HTTP & WebSocket
+
+🧩 Handling Edge Cases
+Multiple users toggling same checkbox → handled via Redis atomic ops
+Page refresh → full state fetched from Redis
+Socket disconnect/reconnect handled gracefully
+Spam clicks → blocked via rate limiting
+🎨 Frontend Optimization
+Avoid rendering all checkboxes at once
+Use virtualization / batching
+Efficient DOM updates on state change
+🚀 Local Setup & Installation
+Prerequisites
+Node.js (v18+)
+Redis server running locally
+OAuth credentials
+1. Clone Repository
+git clone https://github.com/peeyushtiwari888/1M-CHECKBOX-PROJECT.git
+cd 1M-CHECKBOX-PROJECT
+2. Install Dependencies
+npm install
+3. Environment Variables
+
+Create .env file:
+
+PORT=8000
+
+SESSION_SECRET=your_secret
+
+OAUTH_CLIENT_ID=your_client_id
+OAUTH_CLIENT_SECRET=your_client_secret
+
+REDIS_URL=redis://localhost:6379
+4. Start Redis
+redis-server
+5. Run Application
 npm run dev
-# or
-node index.js
-```
+6. Open in Browser
+http://localhost:8000
+📡 WebSocket Events
+Event	Description
+toggle	Client requests checkbox toggle
+update	Server broadcasts checkbox update
+error	Rate limit / auth errors
+📁 Project Structure
+project/
+│
+├── client/
+├── server/
+│   ├── sockets/
+│   ├── redis/
+│   ├── auth/
+│   ├── rateLimiter/
+│   └── routes/
+│
+├── .env.example
+└── README.md
+🎥 Demo Video
 
-Open your browser and navigate strictly to `http://localhost:8000`. 
-*(Note: Do not use 127.0.0.1 or an external Live Server extension, as this will break the OAuth callback and WebSocket connections).*
+👉 Add your unlisted YouTube link here
 
-## 🛡 Architecture & Security Details
+🌐 Live Demo
 
-*   **Socket.IO with Express Sessions:** The application shares the session middleware between Express and Socket.IO. When a client emits a `client:checkbox:change` event, the server verifies `socket.request.session.passport.user` before processing the request.
-*   **Custom Rate Limiting:** A `Map` is used to track the `lastOperationTime` for every connected socket ID. If a user tries to toggle a checkbox before the 5-second cooldown expires, the server drops the request and emits a `server:error` back to the client, triggering a UI toast notification.
+👉 Add deployed link here (if available)
+
+📸 Screenshots
+
+👉 Add UI screenshots here
+
+🧪 Evaluation Coverage
+Real-time updates using WebSockets
+Redis Bitmap for scalable storage
+Redis Pub/Sub for distributed sync
+Custom rate limiting (no external libs)
+OAuth authentication implemented
+Clean backend structure
+Optimized frontend rendering
+🧠 Key Learnings
+Real-time system design
+WebSocket communication
+Redis advanced usage (Bitmap + Pub/Sub)
+Rate limiting strategies
+Authentication integration with sockets
+Handling scale and concurrency
+📌 Submission Links
+🔗 GitHub Repo: https://github.com/peeyushtiwari888/1M-CHECKBOX-PROJECT
+🎥 Demo Video: Add YouTube link
+🌐 Live Project: Add link
+👨‍💻 Author
+
+Peeyush Tiwari
+
+
+---
+
+If you want next upgrade (very useful for marks):
+- 🔥 Badges (build, tech stack, stars)
+- 📊 Architecture diagram image
+- 🎬 YouTube demo script (perfect explanation flow)
+
+Just tell me 👍y usage
+

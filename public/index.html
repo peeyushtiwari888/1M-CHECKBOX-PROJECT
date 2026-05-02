@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Million Checkboxes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --surface: rgba(30, 41, 59, 0.7);
+            --surface-border: rgba(255, 255, 255, 0.1);
+            --ink: #f8fafc;
+            --accent: #8b5cf6;
+            --accent-hover: #a78bfa;
+            --accent-glow: rgba(139, 92, 246, 0.4);
+            --line: rgba(255, 255, 255, 0.05);
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Space Grotesk", "Segoe UI", sans-serif;
+            color: var(--ink);
+            background: var(--bg-gradient);
+            padding: 48px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .shell {
+            width: min(1200px, 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            margin: 0 0 16px;
+            font-family: "DM Serif Display", Georgia, serif;
+            font-size: clamp(3rem, 6vw, 5rem);
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            text-align: center;
+            background: linear-gradient(to right, #c4b5fd, #8b5cf6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 40px rgba(139, 92, 246, 0.3);
+        }
+
+        p {
+            margin: 0 auto 40px;
+            padding: 12px 24px;
+            border-radius: 999px;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            color: #ddd6fe;
+            font-size: 1.1rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        #container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, 28px);
+            justify-content: center;
+            gap: 12px;
+            padding: 32px;
+            border-radius: 24px;
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--surface-border);
+            box-shadow: var(--shadow);
+            width: 100%;
+            min-height: 60vh;
+            align-content: start;
+        }
+
+        #container input[type="checkbox"] {
+            appearance: none;
+            width: 28px;
+            height: 28px;
+            margin: 0 auto;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(15, 23, 42, 0.5);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #container input[type="checkbox"]:hover {
+            transform: translateY(-2px) scale(1.05);
+            border-color: var(--accent-hover);
+            box-shadow: 0 0 15px var(--accent-glow);
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        #container input[type="checkbox"]:checked {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+            transform: scale(1.1);
+        }
+
+        #container input[type="checkbox"]:checked::after {
+            content: "";
+            position: absolute;
+            left: 9px;
+            top: 4px;
+            width: 6px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+            animation: checkmark 0.2s ease-in-out forwards;
+        }
+
+        @keyframes checkmark {
+            0% {
+                opacity: 0;
+                transform: rotate(45deg) scale(0.5);
+            }
+            100% {
+                opacity: 1;
+                transform: rotate(45deg) scale(1);
+            }
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 32px;
+            transform: translateX(-50%) translateY(20px) scale(0.95);
+            max-width: min(420px, calc(100vw - 32px));
+            padding: 16px 24px;
+            border-radius: 16px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: #f8fafc;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            z-index: 100;
+        }
+
+        .toast.is-visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+
+        @media (max-width: 860px) {
+            body {
+                padding: 24px 16px;
+            }
+            h1 {
+                font-size: clamp(2.5rem, 8vw, 3.5rem);
+            }
+            #container {
+                padding: 20px;
+                gap: 8px;
+                grid-template-columns: repeat(auto-fit, 24px);
+            }
+            #container input[type="checkbox"] {
+                width: 24px;
+                height: 24px;
+                border-radius: 6px;
+            }
+            #container input[type="checkbox"]:checked::after {
+                left: 7px;
+                top: 3px;
+                width: 5px;
+                height: 10px;
+            }
+        }
+        .header {
+            width: min(1200px, 100%);
+            display: flex;
+            justify-content: flex-end;
+            padding-bottom: 24px;
+        }
+
+        .auth-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .auth-btn {
+            padding: 8px 16px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            background: rgba(139, 92, 246, 0.2);
+            color: #ddd6fe;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .auth-btn:hover {
+            background: rgba(139, 92, 246, 0.4);
+            color: white;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .google-btn {
+            background: white;
+            color: #333;
+            border-color: #ddd;
+        }
+
+        .google-btn:hover {
+            background: #f8f9fa;
+            color: #111;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #f8fafc;
+            font-weight: 500;
+        }
+
+        .user-info img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid rgba(139, 92, 246, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div id="auth-container" class="auth-container">
+            <!-- Auth UI will be injected here -->
+        </div>
+    </header>
+    <main class="shell">
+        <h1>Checkboxes</h1>
+        <p>500 Socket connection.</p>
+        <div id="container">
+        </div>
+    </main>
+    <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const container=document.getElementById('container');
+        const toast=document.getElementById('toast');
+        const socket=io();
+        const CHECKBOX_COUNT=500;
+        let toastTimeout;
+        let currentUser = null;
+
+        async function fetchUser() {
+            try {
+                const response = await fetch('/api/user');
+                currentUser = await response.json();
+                updateAuthUI();
+            } catch (err) {
+                console.error("Failed to fetch user", err);
+            }
+        }
+
+        function updateAuthUI() {
+            const authContainer = document.getElementById('auth-container');
+            if (currentUser) {
+                authContainer.innerHTML = `
+                    <div class="user-info">
+                        ${currentUser.photos && currentUser.photos[0] ? `<img src="${currentUser.photos[0].value}" alt="Avatar">` : ''}
+                        <span>${currentUser.displayName || 'User'}</span>
+                        <a href="/auth/logout" class="auth-btn">Logout</a>
+                    </div>
+                `;
+            } else {
+                authContainer.innerHTML = `<a href="/auth/google" class="auth-btn google-btn">Login with Google</a>`;
+            }
+        }
+
+        fetchUser();
+
+        function showToast(message){
+            toast.textContent=message;
+            toast.classList.add('is-visible');
+            clearTimeout(toastTimeout);
+            toastTimeout=setTimeout(()=>{
+                toast.classList.remove('is-visible');
+            },3000);
+        }
+
+        new Array(CHECKBOX_COUNT).fill(null).forEach((_,index)=>{
+            const input=document.createElement('input');
+            input.id=`checkbox-${index}`;
+            input.type='checkbox';
+            input.addEventListener('change',(event)=>{
+                if (!currentUser) {
+                    event.preventDefault();
+                    event.target.checked = !event.target.checked;
+                    showToast("You must be logged in to modify checkboxes.");
+                    return;
+                }
+                let checked=event.target.checked;
+                socket.emit("client:checkbox:change",{index,checked})
+            });
+            container.appendChild(input);
+        })
+        socket.on("server:checkbox:change",data=>{
+            document.querySelector(`#checkbox-${data.index}`).checked=data.checked;
+            console.log(data)
+        })
+        socket.on("server:checkbox:status",data=>{
+            data.forEach((_,index)=>{
+                document.querySelector(`#checkbox-${index}`).checked=data[index];
+            })
+        })
+
+        socket.on("server:error",error=>{
+            let checkbox=document.querySelector(`#checkbox-${error.data.index}`)
+            checkbox.checked=!error.data.checked;
+            showToast(error.message || "Something went wrong. Please try again.");
+        });
+
+    </script>
+</body>
+</html>

@@ -54,18 +54,22 @@ The application is designed to handle a large number of checkboxes efficiently w
 
 ## 🧠 System Architecture
 
+## 🧠 System Architecture
+
+```text
 Client (Browser)
-↓
+      ↓
 WebSocket Connection (Socket.IO)
-↓
+      ↓
 Node.js + Express Server
-↓
+      ↓
 Redis
-├── Bitmap (Checkbox State)
-├── Pub/Sub (Real-time Sync)
-└── Rate Limiting (Counters)
+ ├── Bitmap (Checkbox State)
+ ├── Pub/Sub (Real-time Sync)
+ └── Rate Limiting (Counters)
 
 ---
+```
 
 ## ⚙️ How It Works
 
@@ -230,25 +234,6 @@ project/
 👉 Add UI screenshots here
 
 ---
-
-## 🧪 Evaluation Coverage
-
-- Real-time updates using WebSockets
-- Redis Bitmap for scalable storage
-- Redis Pub/Sub for distributed sync
-- Custom rate limiting (no external libs)
-- OAuth authentication implemented
-- Clean backend structure
-- Optimized frontend rendering
-
-## 🧠 Key Learnings
-
-- Real-time system design
-- WebSocket communication
-- Redis advanced usage (Bitmap + Pub/Sub)
-- Rate limiting strategies
-- Authentication integration with sockets
-- Handling scale and concurrency
 
 ## 📌 Submission Links
 

@@ -229,16 +229,12 @@ project/
 
 👉 Add deployed link here (if available)
 
-## 📸 Screenshots
-
-👉 Add UI screenshots here
-
 ---
 
 ## 📌 Submission Links
 
 - 🔗 GitHub Repo: https://github.com/peeyushtiwari888/1M-CHECKBOX-PROJECT
-- 🎥 Demo Video: Add YouTube link
+- 🎥 Demo Video: https://youtu.be/mhyfudI_Epw
 - 🌐 Live Project: Add link
 
 ## 👨‍💻 Author
